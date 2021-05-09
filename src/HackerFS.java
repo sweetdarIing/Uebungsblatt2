@@ -11,14 +11,15 @@ public class HackerFS {
      * Set the working directory to the root folder.
      */
     public HackerFS() {
-        throw new RuntimeException("TODO");
+        this.root = new Directory("", null);
+        this.wd = this.root;
     }
 
     // ----------------------------------------------------
     // Directory Functions
 
     public void enterDirectory() {
-        throw new RuntimeException("TODO");
+        this.wd = this.root;
     }
 
     /**
@@ -28,7 +29,12 @@ public class HackerFS {
      * @throws NoSuchFileOrDirectory if the directory name does not exist in the current working directory
      */
     public void enterDirectory(String name) throws NoSuchFileOrDirectory {
-        throw new RuntimeException("TODO");
+        Optional<Directory> dir = this.wd.containsDirectory(name);
+        if (dir.isEmpty()) {
+            throw new NoSuchFileOrDirectory("NoSuchFileOrDirectory");
+        } else {
+            this.wd = dir.get();
+        }
     }
 
     /**
@@ -36,7 +42,9 @@ public class HackerFS {
      * If the current working directory is root, do nothing.
      */
     public void leaveDirectory() {
-        throw new RuntimeException("TODO");
+        if (this.wd.getParent() != null) {
+            this.wd = (Directory) this.wd.getParent();
+        }
     }
 
     /**
@@ -45,7 +53,7 @@ public class HackerFS {
      * @return name of the working directory.
      */
     public String getWorkingDirectory() {
-        throw new RuntimeException("TODO");
+        return this.wd.getPath();
     }
 
     /**
@@ -55,7 +63,11 @@ public class HackerFS {
      * @throws AlreadyExists if a file or directory with the same name already exists in the current working directory.
      */
     public void createDirectory(String name) throws AlreadyExists {
-        throw new RuntimeException("TODO");
+        if (this.wd.contains(name).isEmpty()) {
+            this.wd.addEntry(new Directory(name, this.wd));
+        } else {
+            throw new AlreadyExists("AlreadyExists");
+        }
     }
 
     // ----------------------------------------------------
@@ -68,7 +80,11 @@ public class HackerFS {
      * @throws AlreadyExists if a file or directory with the same name already exists in the current working directory.
      */
     public void createEmptyFile(String name) throws AlreadyExists {
-        throw new RuntimeException("TODO");
+        if (this.wd.contains(name).isEmpty()) {
+            this.wd.addEntry(new File(name, this.wd));
+        } else {
+            throw new AlreadyExists("AlreadyExists");
+        }
     }
 
     /**
@@ -79,7 +95,12 @@ public class HackerFS {
      * @throws NoSuchFileOrDirectory if no file with name exists in the current working directory.
      */
     public void writeFile(String name, String content) throws NoSuchFileOrDirectory {
-        throw new RuntimeException("TODO");
+        Optional<File> file = this.wd.containsFile(name);
+        if (file.isEmpty()) {
+            throw new NoSuchFileOrDirectory("NoSuchFileOrDirectory");
+        } else {
+            file.get().setContent(content);
+        }
     }
 
     /**
@@ -90,7 +111,12 @@ public class HackerFS {
      * @throws NoSuchFileOrDirectory if no file with name exists in the current working directory.
      */
     public String readFile(String name) throws NoSuchFileOrDirectory {
-        throw new RuntimeException("TODO");
+        Optional<File> file = this.wd.containsFile(name);
+        if (file.isEmpty()) {
+            throw new NoSuchFileOrDirectory("NoSuchFileOrDirectory");
+        } else {
+            return file.get().getContent();
+        }
     }
 
     // ----------------------------------------------------
@@ -104,26 +130,31 @@ public class HackerFS {
      * @throws NotEmpty in an attempt to remove a non-empty directory
      */
     public void remove(String name) throws NoSuchFileOrDirectory, NotEmpty {
-        throw new RuntimeException("TODO");
+        Optional<FSObject> obj = this.wd.contains(name);
+        if (obj.isEmpty()) {
+            throw new NoSuchFileOrDirectory("NoSuchFileOrDirectory");
+        } else {
+            obj.get().remove();
+        }
     }
 
     // calls corresponding function of Directory class
     public String list() {
-        throw new RuntimeException("TODO");
+        return this.wd.list();
     }
 
     // calls corresponding function of Directory class
     public String listLong() {
-        throw new RuntimeException("TODO");
+        return this.wd.listLong();
     }
 
     // calls corresponding function of Directory class
     public String find() {
-        throw new RuntimeException("TODO");
+        return this.wd.find();
     }
 
     // calls corresponding function of Directory class
     public String find(String name) {
-        throw new RuntimeException("TODO");
+        return this.wd.find(name);
     }
 }

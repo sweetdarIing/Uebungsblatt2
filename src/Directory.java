@@ -1,6 +1,11 @@
+import javax.swing.text.html.Option;
 import java.util.*;
 
 public class Directory implements FSObject {
+    private String name;
+    private FSObject parent;
+    private List<FSObject> content = new ArrayList<>();
+
     /**
      * The constructor
      *
@@ -8,31 +13,32 @@ public class Directory implements FSObject {
      * @param parent Parent FSObject of the directory
      */
     public Directory(String name, FSObject parent) {
-        throw new RuntimeException("TODO");
+        setName(name);
+        setParent(parent);
     }
 
     // name getter
     @Override
     public String getName() {
-        throw new RuntimeException("TODO");
+        return this.name;
     }
 
     // name setter
     @Override
     public void setName(String name) {
-        throw new RuntimeException("TODO");
+        this.name = name;
     }
 
     // parent getter
     @Override
     public FSObject getParent() {
-        throw new RuntimeException("TODO");
+        return this.parent;
     }
 
     // parent setter
     @Override
     public void setParent(FSObject parent) {
-        throw new RuntimeException("TODO");
+        this.parent = parent;
     }
 
     /**
@@ -44,7 +50,11 @@ public class Directory implements FSObject {
      */
     @Override
     public String getPath() {
-        throw new RuntimeException("TODO");
+        String path = getName() + "/";
+        if (getParent() != null) {
+            path = getParent().getPath() + path;
+        }
+        return path;
     }
 
     /**
@@ -55,7 +65,14 @@ public class Directory implements FSObject {
      */
     @Override
     public void remove() throws NotEmpty {
-        throw new RuntimeException("TODO");
+        if (isEmpty()) {
+            ((Directory) getParent()).removeEntry(this);
+            setName(null);
+            setParent(null);
+            this.content = null;
+        } else {
+            throw new NotEmpty("NotEmpty");
+        }
     }
 
     /**
@@ -64,7 +81,7 @@ public class Directory implements FSObject {
      * @return true if the directory is empty.
      */
     public boolean isEmpty() {
-        throw new RuntimeException("TODO");
+        return this.content.isEmpty();
     }
 
     /**
@@ -75,7 +92,12 @@ public class Directory implements FSObject {
      * @throws AlreadyExists if the directory contains already an FSObject with the same name.
      */
     public void addEntry(FSObject e) throws AlreadyExists {
-        throw new RuntimeException("TODO");
+        for (FSObject o : this.content) {
+            if (o.getName().equals(e.getName())) {
+                throw new AlreadyExists("Already Exists");
+            }
+        }
+        this.content.add(e);
     }
 
     /**
@@ -85,7 +107,7 @@ public class Directory implements FSObject {
      * @param e the element that should be removed from the directory's content list.
      */
     public void removeEntry(FSObject e) {
-        throw new RuntimeException("TODO");
+        this.content.remove(e);
     }
 
     /**
@@ -95,7 +117,12 @@ public class Directory implements FSObject {
      * @return If the file is found, return an Optional with the File reference. Otherwise return an empty Optional instance.
      */
     public Optional<File> containsFile(String name) {
-        throw new RuntimeException("TODO");
+        for (FSObject o : this.content) {
+            if (o.getName().equals(name) && o instanceof File) {
+                return Optional.of((File) o);
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -105,7 +132,12 @@ public class Directory implements FSObject {
      * @return If the directory is found, return an Optional with the Directory reference. Otherwise return an empty Optional instance.
      */
     public Optional<Directory> containsDirectory(String name) {
-        throw new RuntimeException("TODO");
+        for (FSObject o : this.content) {
+            if (o.getName().equals(name) && o instanceof Directory) {
+                return Optional.of((Directory) o);
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -115,7 +147,12 @@ public class Directory implements FSObject {
      * @return If the object is found, return an Optional with the FSObject reference. Otherwise return an empty Optional instance.
      */
     public Optional<FSObject> contains(String name) {
-        throw new RuntimeException("TODO");
+        for (FSObject o : this.content) {
+            if (o.getName().equals(name)) {
+                return Optional.of(o);
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -126,7 +163,11 @@ public class Directory implements FSObject {
      * @return Contents of the directory as multi-line String
      */
     public String list() {
-        throw new RuntimeException("TODO");
+        String list = "";
+        for (FSObject o : this.content) {
+            list += o.getName() + "\n";
+        }
+        return list;
     }
 
     /**
@@ -139,7 +180,17 @@ public class Directory implements FSObject {
      * @return Contents of the directory with additional information as multi-line String
      */
     public String listLong() {
-        throw new RuntimeException("TODO");
+        String list = "";
+        for (FSObject o : this.content) {
+            if (o instanceof File) {
+                list += "f " + o.getName() + " (size " + ((File) o).getSize() + ")\n";
+            } else if (((Directory) o).isEmpty()){
+                list += "d " + o.getName() + " (empty)\n";
+            } else {
+                list += "d " + o.getName() + " (not empty)\n";
+            }
+        }
+        return list;
     }
 
     /**
@@ -148,7 +199,14 @@ public class Directory implements FSObject {
      * @return A multi-line String with the full path of found files and directories.
      */
     public String find() {
-        throw new RuntimeException("TODO");
+        String list = "";
+        for (FSObject o : this.content) {
+            list += o.getPath() + "\n";
+            if (o instanceof Directory) {
+                list += ((Directory) o).find();
+            }
+        }
+        return list;
     }
 
     /**
@@ -159,6 +217,15 @@ public class Directory implements FSObject {
      * @return A multi-line String with the full path of found files and directories.
      */
     public String find(String searchTerm) {
-        throw new RuntimeException("TODO");
+        String list = "";
+        for (FSObject o : this.content) {
+            if (o.getName().contains(searchTerm)) {
+                list += o.getPath() + "\n";
+            }
+            if (o instanceof Directory) {
+                list += ((Directory) o).find(searchTerm);
+            }
+        }
+        return list;
     }
 }

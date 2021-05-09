@@ -1,4 +1,8 @@
 public class File implements FSObject {
+    private String name;
+    private FSObject parent;
+    private String content;
+
     /**
      * The constructor.
      *
@@ -6,31 +10,32 @@ public class File implements FSObject {
      * @param parent Parent FSObject of the file.
      */
     public File(String name, FSObject parent) {
-        throw new RuntimeException("TODO");
+        setName(name);
+        setParent(parent);
     }
 
     // name getter
     @Override
     public String getName() {
-        throw new RuntimeException("TODO");
+        return this.name;
     }
 
     // name setter
     @Override
     public void setName(String name) {
-        throw new RuntimeException("TODO");
+        this.name = name;
     }
 
     // parent getter
     @Override
     public FSObject getParent() {
-        throw new RuntimeException("TODO");
+        return this.parent;
     }
 
     // parent setter
     @Override
     public void setParent(FSObject parent) {
-        throw new RuntimeException("TODO");
+        this.parent = parent;
     }
 
     /**
@@ -39,7 +44,7 @@ public class File implements FSObject {
      * @return content of the file
      */
     public String getContent() {
-        throw new RuntimeException("TODO");
+        return this.content;
     }
 
     /**
@@ -48,7 +53,7 @@ public class File implements FSObject {
      * @param content gets written to the file. Any existing content is overwritten.
      */
     public void setContent(String content) {
-        throw new RuntimeException("TODO");
+        this.content = content;
     }
 
     /**
@@ -57,7 +62,11 @@ public class File implements FSObject {
      * @return length of the content String
      */
     public int getSize() {
-        throw new RuntimeException("TODO");
+        if (getContent() != null) {
+            return getContent().length();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -69,7 +78,11 @@ public class File implements FSObject {
      */
     @Override
     public String getPath() {
-        throw new RuntimeException("TODO");
+        String path = getName();
+        if (getParent() != null) {
+            path = getParent().getPath() + path;
+        }
+        return path;
     }
 
     /**
@@ -78,6 +91,9 @@ public class File implements FSObject {
      */
     @Override
     public void remove() {
-        throw new RuntimeException("TODO");
+        ((Directory) getParent()).removeEntry(this);
+        setName(null);
+        setParent(null);
+        setContent(null);
     }
 }
